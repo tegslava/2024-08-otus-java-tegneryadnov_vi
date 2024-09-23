@@ -58,7 +58,7 @@ public class TestRunner {
      * @param testSuiteMethods массив методов
      */
     private static void testingMethods(Method[] testSuiteMethods) {
-        Comparator<Method> comparator = Comparator.comparingInt(a -> -1 * a.getAnnotation(Test.class).priority());
+        Comparator<Method> comparator = Comparator.comparingInt(a -> -1 * a.getAnnotation(Test.class).priority().ordinal());
         for (var m : Arrays.stream(testSuiteMethods).sorted(comparator).toList()) {
             if (!m.isAnnotationPresent(Disabled.class)) {
                 try {

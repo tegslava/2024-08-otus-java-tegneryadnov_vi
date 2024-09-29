@@ -7,25 +7,29 @@ import java.util.*;
 
 import ru.otus.annotations.*;
 import ru.otus.testexceptions.MethodTestFailedException;
+import ru.otus.testexceptions.TestClassDisabledException;
 
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class TestRunner {
     private static int disabledMethod;
     private static int methodTestPassed;
     private static int methodTestFailed;
-    private static Class clazz;
+    private static Class<?> clazz;
 
-    public static void run(Class testSuiteClass) {
+    public static void run(Class<?> testSuiteClass) {
         clazz = testSuiteClass;
-        if (classDisabledCheck()) return;
-        var beforeSuiteMethods = getAnnotatedMethods(BeforeSuite.class);
-        var afterSuiteMethods = getAnnotatedMethods(AfterSuite.class);
-        var testSuiteMethods = getAnnotatedMethods(Test.class);
-        classMarkupCheck(beforeSuiteMethods, afterSuiteMethods);
-        execAdditionalMethod(beforeSuiteMethods, "Test initialization error: ");
-        testingMethods(testSuiteMethods);
-        execAdditionalMethod(afterSuiteMethods, "Test finalization error: ");
-        showTestsStatistic();
+        try {
+            classDisabledCheck();
+            var beforeSuiteMethods = getAnnotatedMethods(BeforeSuite.class);
+            var afterSuiteMethods = getAnnotatedMethods(AfterSuite.class);
+            var testSuiteMethods = getAnnotatedMethods(Test.class);
+            classMarkupCheck(beforeSuiteMethods, afterSuiteMethods);
+            execMethods(beforeSuiteMethods, "Test initialization error: ");
+            testingMethods(testSuiteMethods);
+            execMethods(afterSuiteMethods, "Test finalization error: ");
+            showTestsStatistic();
+        } catch (TestClassDisabledException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
@@ -35,7 +39,7 @@ public class TestRunner {
      *
      * @param methods массив методов
      */
-    private static void execAdditionalMethod(Method[] methods, String message) {
+    private static void execMethods(Method[] methods, String message) {
         for (var m : methods) {
             if (!m.isAnnotationPresent(Disabled.class)) {
                 try {
@@ -58,7 +62,7 @@ public class TestRunner {
      * @param testSuiteMethods массив методов
      */
     private static void testingMethods(Method[] testSuiteMethods) {
-        Comparator<Method> comparator = Comparator.comparingInt(a -> -1 * a.getAnnotation(Test.class).priority().ordinal());
+        Comparator<Method> comparator = Comparator.comparingInt((Method a) -> a.getAnnotation(Test.class).priority().ordinal()).reversed();
         for (var m : Arrays.stream(testSuiteMethods).sorted(comparator).toList()) {
             if (!m.isAnnotationPresent(Disabled.class)) {
                 try {
@@ -82,16 +86,12 @@ public class TestRunner {
     /**
      * Проверяет, помечен ли класс аннтоацией @Disabled
      *
-     * @return boolean
      */
-    private static boolean classDisabledCheck() {
-        Optional<Disabled> annotationClassDisabled = Optional.ofNullable((Disabled) clazz.getAnnotation(Disabled.class));
+    private static void classDisabledCheck() throws TestClassDisabledException {
+        var annotationClassDisabled = Optional.ofNullable(clazz.getAnnotation(Disabled.class));
         if (annotationClassDisabled.isPresent()) {
-            var reason = annotationClassDisabled.get().reason();
-            System.out.println("Test class " + clazz.getSimpleName() + " " + reason);
-            return true;
+            throw new TestClassDisabledException(clazz, annotationClassDisabled.get().reason());
         }
-        return false;
     }
 
     /**
@@ -148,7 +148,7 @@ public class TestRunner {
         System.out.printf("""
 
                 Method testing statistics for %s
-                  - tests passed %d;\r
+                  - tests passed %d;
                   - tests failed %d;
                   - tests disabled %d;
 

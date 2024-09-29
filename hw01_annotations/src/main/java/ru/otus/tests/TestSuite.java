@@ -33,7 +33,7 @@ public class TestSuite {
         System.out.println("test5\tpriority = 10");
     }
 
-    @Test(priority = TestPriority.FREE)
+    @Test(priority = TestPriority.THREE)
     public static void test6() {
         System.out.println("test6\tpriority = 3");
     }

@@ -2,8 +2,8 @@ package ru.otus.priority;
 
 public enum TestPriority {
     ONE,
-    TWO, 
-    FREE,
+    TWO,
+    THREE,
     FOUR,
     FIVE,
     SIX,

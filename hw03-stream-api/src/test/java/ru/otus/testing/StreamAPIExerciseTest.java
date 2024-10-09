@@ -1,20 +1,19 @@
-package ru.otus.task;
+package ru.otus.testing;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import ru.otus.testing.task.Task;
+import ru.otus.testing.task.TaskStatus;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class StreamAPIExerciseTest {
     private static Stream<Task> taskStream;
@@ -73,48 +72,44 @@ public class StreamAPIExerciseTest {
     @Test
     @DisplayName("Список задач со статусом “В работе”")
     void tasksWithStatusACTIVE() {
-        List<Task> filteredTaskList = taskStream.filter(x -> x.getTaskStatus() == TaskStatus.ACTIVE).toList();
-        assertThat(filteredTaskList).hasSize(3);
-        assertThat(filteredTaskList).contains("Задача 4 в работе");
-        assertThat(filteredTaskList.contains("Задача 6 в работе"));
-        assertThat(filteredTaskList.contains("Задача 9 в работе"));
+        var activeTaskList = StreamAPIExercise.getTasksListWithStatus(taskStream, TaskStatus.ACTIVE);
+        var testedSet = activeTaskList.stream().map(Task::getTaskStatus).collect(Collectors.toSet());
+        assertEquals(Set.of(TaskStatus.ACTIVE), testedSet);
     }
 
     @Test
     @DisplayName("Количество задач со статусом “Закрыта”")
     void tasksCountWithStatusCLOSED() {
-        long cnt = taskStream.filter(x -> x.getTaskStatus() == TaskStatus.CLOSED).count();
+        long cnt = StreamAPIExercise.getTaskCountWithStatus(taskStream, TaskStatus.CLOSED);
         assertEquals(4, cnt);
     }
 
     @Test
     @DisplayName("Наличие задачи с ID = 2 и отсутствие с ID = 99")
     void conditionIsMet() {
-        var s = taskStream.map(Task::getId).collect(Collectors.toSet());
-        assertThat(s.contains(2L) & !s.contains(99L));
+        assertThat(StreamAPIExercise.conditionIsMet(taskStream,2L, 99L)).isTrue();
     }
 
     @Test
     @DisplayName("Список задач, отсортированных по статусу (Открыта, В работе, Закрыта)")
     void tasksListSortedByStatus() {
-        Comparator<Task> taskComparator = Comparator.comparingInt(t -> t.getTaskStatus().ordinal());
-        List<TaskStatus> statusList = taskStream.sorted(taskComparator).map(Task::getTaskStatus).toList();
-        List<TaskStatus> expectedStatusList = List.of(
+        var statusTaskList = StreamAPIExercise.getTasksListSortedByStatus(taskStream)
+                .stream()
+                .map(Task::getTaskStatus).toList();
+        var expectedStatusTaskList = List.of(
                 TaskStatus.NEW, TaskStatus.NEW,
                 TaskStatus.ACTIVE, TaskStatus.ACTIVE, TaskStatus.ACTIVE,
                 TaskStatus.CLOSED, TaskStatus.CLOSED, TaskStatus.CLOSED, TaskStatus.CLOSED);
-        assertEquals(expectedStatusList, statusList);
+        assertEquals(expectedStatusTaskList, statusTaskList);
     }
 
     @Test
     @DisplayName("Объединение сначала в группы по статусам, а потом (внутри каждой группы) в подгруппы четных и нечетных по ID")
-    void getTasksGroupByStatusIdEvenOdd() {
-        var mapTasksList = taskStream.collect(
-                Collectors.groupingBy(Task::getTaskStatus,
-                        Collectors.groupingBy(k -> (k.getId() % 2L) == 0)));
-        assertThat(mapTasksList.size()==3);
-        Set<TaskStatus> expectedSetKey = Set.of(TaskStatus.NEW,TaskStatus.ACTIVE,TaskStatus.CLOSED);
-        assertThat(expectedSetKey).isEqualTo(mapTasksList.keySet());
+    void tasksGroupByStatusIdEvenOdd() {
+        var mapTasksList = StreamAPIExercise.getTasksGroupByStatusIdEvenOdd(taskStream);
+        assertEquals(3, mapTasksList.size());
+        Set<TaskStatus> expectedSetKeys = Set.of(TaskStatus.NEW,TaskStatus.ACTIVE,TaskStatus.CLOSED);
+        assertThat(expectedSetKeys).isEqualTo(mapTasksList.keySet());
         assertThat(List.of(1L)).isEqualTo(mapTasksList.get(TaskStatus.NEW).get(false).stream().map(Task::getId).toList());
         assertThat(List.of(2L)).isEqualTo(mapTasksList.get(TaskStatus.NEW).get(true).stream().map(Task::getId).toList());
         assertThat(List.of(9L)).isEqualTo(mapTasksList.get(TaskStatus.ACTIVE).get(false).stream().map(Task::getId).toList());
@@ -124,5 +119,20 @@ public class StreamAPIExerciseTest {
     }
 
     @Test
-    @Display
+    @DisplayName("Разбивка на две группы: со статусом “Закрыто” и остальное. Группа закрытых задач")
+    void TaskGroupInStatuses(){
+        var closedTasksList =
+                StreamAPIExercise.getTaskGroupByStatusAndOthers(taskStream, TaskStatus.CLOSED,true).get(true);
+        var testingSet = closedTasksList.stream().map(Task::getTaskStatus).collect(Collectors.toSet());
+        assertEquals(Set.of(TaskStatus.CLOSED), testingSet);
+    }
+
+    @Test
+    @DisplayName("Разбивка на две группы: со статусом “Закрыто” и остальное. Группа незакрытых задач")
+    void TaskGroupNotInStatuses(){
+        var othersTasksList =
+                StreamAPIExercise.getTaskGroupByStatusAndOthers(taskStream, TaskStatus.CLOSED,false).get(false);
+        var testingTaskStatusSet = othersTasksList.stream().map(Task::getTaskStatus).collect(Collectors.toSet());
+        assertThat(testingTaskStatusSet.contains(TaskStatus.CLOSED)).isFalse();
+    }
 }

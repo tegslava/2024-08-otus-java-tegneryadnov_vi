@@ -1,16 +1,14 @@
-package ru.otus.task;
+package ru.otus.testing.task;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+@Getter
 @Builder
 @ToString
 public class Task {
-    @Getter
     private long id;
-    @Getter
     private String name;
-    @Getter
     private TaskStatus taskStatus;
 }

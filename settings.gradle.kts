@@ -1,5 +1,6 @@
 rootProject.name = "otusJava"
 include("hw01_annotations")
+include("hw03-stream-api")
 
 pluginManagement {
     val jgitver: String by settings

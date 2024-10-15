@@ -82,13 +82,13 @@ subprojects {
         options.compilerArgs.addAll(listOf("-Xlint:all,-serial,-processing"))
     }
 
-    /*apply<name.remal.gradle_plugins.sonarlint.SonarLintPlugin>()
+    apply<name.remal.gradle_plugins.sonarlint.SonarLintPlugin>()
     apply<com.diffplug.gradle.spotless.SpotlessPlugin>()
     configure<com.diffplug.gradle.spotless.SpotlessExtension> {
         java {
             palantirJavaFormat("2.38.0")
         }
-    }*/
+    }
 
     plugins.apply(fr.brouillard.oss.gradle.plugins.JGitverPlugin::class.java)
     extensions.configure<fr.brouillard.oss.gradle.plugins.JGitverPluginExtension> {

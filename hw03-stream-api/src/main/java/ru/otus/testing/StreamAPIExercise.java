@@ -1,16 +1,17 @@
 package ru.otus.testing;
 
-import ru.otus.testing.task.Task;
-import ru.otus.testing.task.TaskStatus;
-
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import ru.otus.testing.task.Task;
+import ru.otus.testing.task.TaskStatus;
 
-public class StreamAPIExercise {
+class StreamAPIExercise {
+    private StreamAPIExercise() {}
+
     /**
      * Список задач с заданным статусом
      *
@@ -53,7 +54,8 @@ public class StreamAPIExercise {
      * @return отсортированный поток задач
      */
     static List<Task> getTasksListSortedByStatus(Stream<Task> taskStream) {
-        Comparator<Task> taskComparator = Comparator.comparingInt(t -> t.getTaskStatus().ordinal());
+        Comparator<Task> taskComparator =
+                Comparator.comparingInt(t -> t.getTaskStatus().ordinal());
         return taskStream.sorted(taskComparator).toList();
     }
 
@@ -65,8 +67,7 @@ public class StreamAPIExercise {
      */
     static Map<TaskStatus, Map<Boolean, List<Task>>> getTasksGroupByStatusIdEvenOdd(Stream<Task> taskStream) {
         return taskStream.collect(
-                Collectors.groupingBy(Task::getTaskStatus,
-                        Collectors.groupingBy(k -> (k.getId() % 2L) == 0)));
+                Collectors.groupingBy(Task::getTaskStatus, Collectors.groupingBy(k -> (k.getId() % 2L) == 0)));
     }
 
     /**
@@ -78,12 +79,15 @@ public class StreamAPIExercise {
      *                   false в группе задачи со статусом, отличным от заданного
      * @return мапа, с ключом byStatus и листом задач
      */
-    static Map<Boolean, List<Task>> getTaskGroupByStatusAndOthers(Stream<Task> taskStream, TaskStatus taskStatus,
-                                                                  boolean byStatus) {
+    static Map<Boolean, List<Task>> getTaskGroupByStatusAndOthers(
+            Stream<Task> taskStream, TaskStatus taskStatus, boolean byStatus) {
         var resultMap = new HashMap<Boolean, List<Task>>();
-        resultMap.put(byStatus, taskStream
-                .collect(Collectors.partitioningBy(task -> task.getTaskStatus().equals(taskStatus))).get(byStatus));
+        resultMap.put(
+                byStatus,
+                taskStream
+                        .collect(Collectors.partitioningBy(
+                                task -> task.getTaskStatus().equals(taskStatus)))
+                        .get(byStatus));
         return resultMap;
     }
 }
-

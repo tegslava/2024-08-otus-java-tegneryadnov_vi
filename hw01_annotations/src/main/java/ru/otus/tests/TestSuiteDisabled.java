@@ -6,8 +6,11 @@ import ru.otus.annotations.Disabled;
 import ru.otus.annotations.Test;
 import ru.otus.priority.TestPriority;
 
+@SuppressWarnings("java:S106")
 @Disabled
 public class TestSuiteDisabled {
+    private TestSuiteDisabled() {}
+
     @BeforeSuite
     public static void init() {
         System.out.println("init");

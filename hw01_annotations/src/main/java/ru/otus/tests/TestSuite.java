@@ -1,8 +1,12 @@
 package ru.otus.tests;
+
 import ru.otus.annotations.*;
 import ru.otus.priority.TestPriority;
 
+@SuppressWarnings("java:S106")
 public class TestSuite {
+    private TestSuite() {}
+
     @BeforeSuite
     private static void init() {
         System.out.println("init");

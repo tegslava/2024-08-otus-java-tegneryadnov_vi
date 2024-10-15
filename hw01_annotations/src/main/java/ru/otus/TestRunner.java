@@ -4,16 +4,18 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-
 import ru.otus.annotations.*;
-import ru.otus.testexceptions.MethodTestFailedException;
+import ru.otus.testexceptions.MethodAccessException;
 import ru.otus.testexceptions.TestClassDisabledException;
 
+@SuppressWarnings("java:S106")
 public class TestRunner {
     private static int disabledMethod;
     private static int methodTestPassed;
     private static int methodTestFailed;
     private static Class<?> clazz;
+
+    private TestRunner() {}
 
     public static void run(Class<?> testSuiteClass) {
         clazz = testSuiteClass;
@@ -43,14 +45,23 @@ public class TestRunner {
         for (var m : methods) {
             if (!m.isAnnotationPresent(Disabled.class)) {
                 try {
-                    if (m.trySetAccessible()) m.invoke(null);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(message + e.getMessage());
+                    execMethod(message, m);
+                } catch (MethodAccessException e) {
+                    System.out.println(e.getMessage());
                 }
             } else {
                 disabledMethod++;
-                System.out.println(m.getName() + "\t" + m.getAnnotation(Disabled.class).reason());
+                System.out.println(
+                        m.getName() + "\t" + m.getAnnotation(Disabled.class).reason());
             }
+        }
+    }
+
+    private static void execMethod(String message, Method m) throws MethodAccessException {
+        try {
+            if (m.trySetAccessible()) m.invoke(null);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new MethodAccessException(m, message + e.getMessage());
         }
     }
 
@@ -62,35 +73,34 @@ public class TestRunner {
      * @param testSuiteMethods массив методов
      */
     private static void testingMethods(Method[] testSuiteMethods) {
-        Comparator<Method> comparator = Comparator.comparingInt((Method a) -> a.getAnnotation(Test.class).priority().ordinal()).reversed();
+        Comparator<Method> comparator = Comparator.comparingInt(
+                        (Method a) -> a.getAnnotation(Test.class).priority().ordinal())
+                .reversed();
         for (var m : Arrays.stream(testSuiteMethods).sorted(comparator).toList()) {
             if (!m.isAnnotationPresent(Disabled.class)) {
                 try {
-                    try {
-                        m.invoke(null);
-                        methodTestPassed++;
-                    } catch (IllegalAccessException | InvocationTargetException e) {
-                        throw new MethodTestFailedException(m, e.getMessage());
-                    }
-                } catch (MethodTestFailedException ef) {
+                    execMethod("", m);
+                    methodTestPassed++;
+                } catch (MethodAccessException ef) {
                     methodTestFailed++;
                     System.out.println(ef.getMessage());
                 }
             } else {
                 disabledMethod++;
-                System.out.println(m.getName() + "\t" + m.getAnnotation(Disabled.class).reason());
+                System.out.println(
+                        m.getName() + "\t" + m.getAnnotation(Disabled.class).reason());
             }
         }
     }
 
     /**
      * Проверяет, помечен ли класс аннтоацией @Disabled
-     *
      */
     private static void classDisabledCheck() throws TestClassDisabledException {
         var annotationClassDisabled = Optional.ofNullable(clazz.getAnnotation(Disabled.class));
         if (annotationClassDisabled.isPresent()) {
-            throw new TestClassDisabledException(clazz, annotationClassDisabled.get().reason());
+            throw new TestClassDisabledException(
+                    clazz, annotationClassDisabled.get().reason());
         }
     }
 
@@ -111,9 +121,9 @@ public class TestRunner {
         if (afterSuiteMethods.length > 1) {
             throw new IllegalArgumentException("AfterSuite annotations more than 1");
         }
-        if (existCrossAnnotatedMethods(Test.class, BeforeSuite.class) ||
-                existCrossAnnotatedMethods(Test.class, AfterSuite.class) ||
-                existCrossAnnotatedMethods(BeforeSuite.class, AfterSuite.class)) {
+        if (existCrossAnnotatedMethods(Test.class, BeforeSuite.class)
+                || existCrossAnnotatedMethods(Test.class, AfterSuite.class)
+                || existCrossAnnotatedMethods(BeforeSuite.class, AfterSuite.class)) {
             throw new IllegalArgumentException("Invalid annotation intersection");
         }
     }
@@ -125,8 +135,10 @@ public class TestRunner {
      * @param annotation2 вторая аннотация
      * @return booolean
      */
-    private static boolean existCrossAnnotatedMethods(Class<? extends Annotation> annotation1, Class<? extends Annotation> annotation2) {
-        return Arrays.stream(clazz.getDeclaredMethods()).anyMatch(x -> x.isAnnotationPresent(annotation1) && x.isAnnotationPresent(annotation2));
+    private static boolean existCrossAnnotatedMethods(
+            Class<? extends Annotation> annotation1, Class<? extends Annotation> annotation2) {
+        return Arrays.stream(clazz.getDeclaredMethods())
+                .anyMatch(x -> x.isAnnotationPresent(annotation1) && x.isAnnotationPresent(annotation2));
     }
 
     /**
@@ -145,13 +157,15 @@ public class TestRunner {
      * Выводит статистику тестирования
      */
     public static void showTestsStatistic() {
-        System.out.printf("""
+        System.out.printf(
+                """
 
                 Method testing statistics for %s
                   - tests passed %d;
                   - tests failed %d;
                   - tests disabled %d;
 
-                """, clazz.getName(), methodTestPassed, methodTestFailed, disabledMethod);
+                """,
+                clazz.getName(), methodTestPassed, methodTestFailed, disabledMethod);
     }
 }

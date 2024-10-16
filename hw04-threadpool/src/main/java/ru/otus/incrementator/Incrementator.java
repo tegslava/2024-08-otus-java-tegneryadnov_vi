@@ -1,4 +1,4 @@
-package ru.otus.thread_exp;
+package ru.otus.incrementator;
 
 @SuppressWarnings("java:S106")
 class Incremenator extends Thread {

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class MyThreadPool {
     private static final Logger logger = LoggerFactory.getLogger(MyThreadPool.class);
@@ -27,13 +28,12 @@ public class MyThreadPool {
         for (int i = 0; i < threadPoolSize; i++) {
             threadList.add(new Thread());
         }
-
-
         return threadList;
     }
 
     public static void main(String[] args) {
         MyThreadPool myThreadlogger = new MyThreadPool(5);
+        ThreadPoolExecutor
         //logger.info("{}", myThreadlogger.threadList.size());
         //myThreadlogger.threadList.forEach(x -> logger.info("{}", x.getName() + " " + x.threadId()));
     }

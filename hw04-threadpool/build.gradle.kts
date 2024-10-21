@@ -6,8 +6,8 @@ dependencies {
 }
 
 tasks.withType<JavaCompile> {
-    //options.encoding = "UTF-8"
-    options.encoding = "windows-1251"
+    options.encoding = "UTF-8"
+    //options.encoding = "windows-1251"
     options.compilerArgs.addAll(listOf("-Xlint:all,-serial,-processing"))
 }
 

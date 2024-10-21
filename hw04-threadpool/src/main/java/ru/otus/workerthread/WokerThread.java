@@ -18,21 +18,22 @@ public class WokerThread {
         });
         worker.start();
         for (int i = 0; i < 10; i++) {
-            queue.put(getTask());
+            queue.put(getTask(i));
         }
     }
 
-    public static Runnable getTask() {
+    public static Runnable getTask(int taskNum) {
+        final int task_num = taskNum;
         return new Runnable() {
             @Override
             public void run() {
-                logger.info("Task started {}",this.hashCode());
+                logger.info("Task {} started",taskNum);
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                logger.info("Task finished {}",this.hashCode());
+                logger.info("Task {} finished",/*this.hashCode()*/taskNum);
             }
         };
     }

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 /***
  * Кастомная реализация пула потоков
  */
+@SuppressWarnings("java:S2446")
 public class CustomThreadPool {
     private static final Logger logger = LoggerFactory.getLogger(CustomThreadPool.class);
     private static final int MIN_THREAD_POOL_SIZE = 1;
@@ -64,11 +65,13 @@ public class CustomThreadPool {
      * Метод помещает задачу в очередь исполнения для пула потоков.
      * После вызова shutdown(), метод не принимает новые задачи
      * @param task задача для исполнения
+     * @return true, если задача поставлена в очередь на исполнение
      */
-    public void execute(Runnable task) {
+    public boolean execute(Runnable task) {
         if (running) {
-            queue.put(task);
+            return queue.put(task);
         }
+        return false;
     }
 
     /***
@@ -91,9 +94,10 @@ public class CustomThreadPool {
             return tasks.poll();
         }
 
-        synchronized void put(Runnable task) {
-            tasks.add(task);
-            notifyAll();
+        synchronized boolean put(Runnable task) {
+            boolean adding = tasks.add(task);
+            if (adding) notify();
+            return adding;
         }
     }
 

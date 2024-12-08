@@ -1,7 +1,6 @@
 rootProject.name = "otusJava"
-include("hw01_annotations")
-include("hw03-stream-api")
-include("hw04-threadpool")
+include("hw09-web-server")
+
 
 pluginManagement {
     val jgitver: String by settings
@@ -24,3 +23,4 @@ pluginManagement {
         id("com.diffplug.spotless") version spotless
     }
 }
+

@@ -15,12 +15,12 @@ public class CalcSubtractServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, NumberFormatException {
-        PrintWriter out = resp.getWriter();
-        resp.setContentType("text/html");
-        int a = Integer.parseInt(req.getParameter("a"));
-        int b = Integer.parseInt(req.getParameter("b"));
-        out.printf("<html><body><h1>%d - %d = %d</h1></body></html>", a, b, a - b);
-        logger.debug("servlet executed");
-        out.close();
+        try (PrintWriter out = resp.getWriter()) {
+            resp.setContentType("text/html");
+            int a = Integer.parseInt(req.getParameter("a"));
+            int b = Integer.parseInt(req.getParameter("b"));
+            out.printf("<html><body><h1>%d - %d = %d</h1></body></html>", a, b, a - b);
+            logger.debug("servlet executed");
+        }
     }
 }

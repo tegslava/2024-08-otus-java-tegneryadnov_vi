@@ -15,13 +15,13 @@ public class CalcDivServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, NumberFormatException {
-        PrintWriter out = resp.getWriter();
-        resp.setContentType("text/html");
-        int a = Integer.parseInt(req.getParameter("a"));
-        int b = Integer.parseInt(req.getParameter("b"));
-        String result = b != 0 ? String.valueOf(a / b) : "ERROR division by 0";
-        out.printf("<html><body><h1>%d / %d = %s</h1></body></html>", a, b, result);
-        logger.debug("servlet executed");
-        out.close();
+        try (PrintWriter out = resp.getWriter()) {
+            resp.setContentType("text/html");
+            int a = Integer.parseInt(req.getParameter("a"));
+            int b = Integer.parseInt(req.getParameter("b"));
+            String result = b != 0 ? String.valueOf(a / b) : "ERROR division by 0";
+            out.printf("<html><body><h1>%d / %d = %s</h1></body></html>", a, b, result);
+            logger.debug("servlet executed");
+        }
     }
 }

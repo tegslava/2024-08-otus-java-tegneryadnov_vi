@@ -17,13 +17,12 @@ public class FilterServlets implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-
         StringBuilder sb = new StringBuilder();
         Enumeration<String> parameterNames = httpServletRequest.getParameterNames();
         while (parameterNames.hasMoreElements()) {
             String name = parameterNames.nextElement();
             String value = httpServletRequest.getParameter(name);
-            sb.append(String.format("%s = %s; ", name, value));
+            sb.append(name).append(" = ").append(value).append("; ");
         }
         logger.info("urlPattern: {}; params: {}", httpServletRequest.getServletPath(), sb);
         filterChain.doFilter(servletRequest, servletResponse);

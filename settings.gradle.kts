@@ -1,5 +1,5 @@
 rootProject.name = "otusJava"
-include("hw01_annotations")
+include("hw10-spring-context")
 
 pluginManagement {
     val jgitver: String by settings

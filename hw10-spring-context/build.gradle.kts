@@ -1,7 +1,7 @@
 dependencies {
     implementation("ch.qos.logback:logback-classic")
 
-    implementation("org.reflections:reflections")
+    //implementation("org.reflections:reflections")
     implementation("org.springframework:spring-context")
 
     testImplementation("org.springframework:spring-test")

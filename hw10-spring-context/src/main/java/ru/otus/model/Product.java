@@ -1,7 +1,7 @@
 package ru.otus.model;
 
 public class Product {
-    private long id;
+    private final long id;
     private String name;
     private double price;
 
@@ -23,15 +23,18 @@ public class Product {
         return price;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return  "id=" + id +
+                ", name='" + name + '\'' +
+                ", price=" + price;
     }
 }

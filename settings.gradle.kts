@@ -1,4 +1,5 @@
 rootProject.name = "otusJava"
+include("hw10-spring-context")
 include("hw01_annotations")
 include("hw03-stream-api")
 include("hw04-threadpool")

@@ -8,29 +8,22 @@ import ru.otus.services.CommandsProcessor;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 
 public class CommandsProcessorImpl implements CommandsProcessor {
     private final Cart cart;
     private final IOService ioService;
-    private final Map<String, BiFunction<Cart, Long, Integer>> cmdMap = new HashMap<>();
+    private final Map<String, BiConsumer<Cart, Long>> cmdMap = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(CommandsProcessor.class);
     private static final String PRPOMPT_STRING = "Введите команду:";
+    private boolean doing = true;
 
     private void initCmdMap() {
-        cmdMap.put("add", (Cart cart, Long id) -> {
-            cart.addProduct(id);
-            return 0;
-        });
-        cmdMap.put("del", (Cart cart, Long id) -> {
-            cart.removeProduct(id);
-            return 0;
-        });
-        cmdMap.put("cart", (Cart cart, Long id) -> {
-            cart.showPurchase();
-            return 0;
-        });
-        cmdMap.put("exit", (Cart cart, Long id) -> -1);
+        cmdMap.put("add", Cart::addProduct);
+        cmdMap.put("del", Cart::removeProduct);
+        cmdMap.put("cart", (cart, id) ->
+                cart.showPurchase());
+        cmdMap.put("exit", (cart, id) -> doing = false);
     }
 
     public CommandsProcessorImpl(IOService ioService, Cart cart) {
@@ -41,7 +34,7 @@ public class CommandsProcessorImpl implements CommandsProcessor {
 
     @Override
     public void processingCommands() {
-        while (true) {
+        while (doing) {
             var inpArr = ioService.readLn(PRPOMPT_STRING).trim().toLowerCase().split(" ");
             var cmd = cmdMap.entrySet().stream()
                     .filter(e -> e.getKey().equals(inpArr[0]))
@@ -57,8 +50,7 @@ public class CommandsProcessorImpl implements CommandsProcessor {
                     continue;
                 }
             try {
-                if (cmd.get().apply(cart, id) == -1)
-                    break;
+                cmd.get().accept(cart, id);
             } catch (Exception e) {
                 logger.error(e.getMessage());
             }

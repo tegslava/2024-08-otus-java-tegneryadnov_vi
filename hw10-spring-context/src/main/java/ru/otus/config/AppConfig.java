@@ -2,6 +2,7 @@ package ru.otus.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import ru.otus.services.*;
 import ru.otus.services.impl.*;
 
@@ -19,6 +20,7 @@ public class AppConfig {
     }
 
     @Bean
+    @Scope("prototype")
     public Cart cart(IOService ioService, ProductRepository productRepository) {
         return new CartImpl(ioService, productRepository);
     }

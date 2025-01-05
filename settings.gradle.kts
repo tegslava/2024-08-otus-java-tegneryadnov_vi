@@ -1,5 +1,5 @@
 rootProject.name = "otusJava"
-include("hw01_annotations")
+include("hw11-spring-boot")
 
 pluginManagement {
     val jgitver: String by settings
@@ -22,4 +22,3 @@ pluginManagement {
         id("com.diffplug.spotless") version spotless
     }
 }
-

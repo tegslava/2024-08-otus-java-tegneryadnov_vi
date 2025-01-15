@@ -14,22 +14,19 @@ import ru.otus.java.pro.spring.app.services.AccountsService;
 public class AccountsController {
     private final AccountsService accountsService;
 
-    private static final Function<Account, AccountDto> ENTITY_TO_DTO =
+    private static final Function<Account, AccountDto> ACCOUNT_TO_DTO =
             a -> new AccountDto(a.getId(), a.getClientId(), a.getAccountNumber(), a.getBalance(), a.isBlocked());
 
     @GetMapping
     public AccountsPageDto getAllAccounts(@RequestHeader(name = "client-id") String clientId) {
-        return new AccountsPageDto(
-                accountsService.getAllAccounts(clientId).stream()
-                        .map(ENTITY_TO_DTO)
-                        .toList()
-                // .collect(Collectors.toList())
-                );
+        return new AccountsPageDto(accountsService.getAllAccounts(clientId).stream()
+                .map(ACCOUNT_TO_DTO)
+                .toList());
     }
 
     @GetMapping("/{id}")
     public AccountDto getAccountById(@RequestHeader(name = "client-id") String clientId, @PathVariable String id) {
-        return ENTITY_TO_DTO.apply(accountsService
+        return ACCOUNT_TO_DTO.apply(accountsService
                 .getAccountById(id, clientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Счет не найден")));
     }

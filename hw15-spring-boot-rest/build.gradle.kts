@@ -7,6 +7,7 @@ dependencies {
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 	runtimeOnly("com.h2database:h2")
+	//implementation("org.flywaydb:flyway-database-postgresql")
 	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework:spring-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")

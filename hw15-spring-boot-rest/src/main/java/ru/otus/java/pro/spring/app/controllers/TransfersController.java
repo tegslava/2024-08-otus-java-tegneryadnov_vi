@@ -16,7 +16,7 @@ import ru.otus.java.pro.spring.app.services.TransfersService;
 public class TransfersController {
     private final TransfersService transfersService;
 
-    private static final Function<Transfer, TransferDto> ENTITY_TO_DTO = t -> new TransferDto(
+    private static final Function<Transfer, TransferDto> TRANSFER_TO_DTO = t -> new TransferDto(
             t.getId(),
             t.getClientId(),
             t.getTargetClientId(),
@@ -27,17 +27,14 @@ public class TransfersController {
 
     @GetMapping
     public TransfersPageDto getAllTransfers(@RequestHeader(name = "client-id") String clientId) {
-        return new TransfersPageDto(
-                transfersService.getAllTransfers(clientId).stream()
-                        .map(ENTITY_TO_DTO)
-                        .toList()
-                // .collect(Collectors.toList())
-                );
+        return new TransfersPageDto(transfersService.getAllTransfers(clientId).stream()
+                .map(TRANSFER_TO_DTO)
+                .toList());
     }
 
     @GetMapping("/{id}")
     public TransferDto getTransferById(@RequestHeader(name = "client-id") String clientId, @PathVariable String id) {
-        return ENTITY_TO_DTO.apply(transfersService
+        return TRANSFER_TO_DTO.apply(transfersService
                 .getTransferById(id, clientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Перевод не найден")));
     }

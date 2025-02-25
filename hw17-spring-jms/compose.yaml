@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  activemq:
+    image: symptoma/activemq:latest
+    container_name: activemq
+    ports:
+      - "61616:61616"
+      - "8161:8161"
+    environment:
+      ACTIVEMQ_DISALLOW_WEBCONSOLE: false
+      ACTIVEMQ_USERNAME: myactivemquser
+      ACTIVEMQ_PASSWORD: myactivemquserpass
+      ACTIVEMQ_WEBADMIN_USERNAME: roos
+      ACTIVEMQ_WEBADMIN_PASSWORD: TestTest
+    volumes:
+      - activemq_data:/var/lib/activemq
+      - activemq_config:/etc/activemq
+
+volumes:
+  activemq_data:
+  activemq_config:

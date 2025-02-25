@@ -8,7 +8,6 @@ import jakarta.jms.ObjectMessage;
 import jakarta.jms.TextMessage;
 import java.io.Serializable;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 import ru.otus.java.pro.config.ActiveMqConfig;

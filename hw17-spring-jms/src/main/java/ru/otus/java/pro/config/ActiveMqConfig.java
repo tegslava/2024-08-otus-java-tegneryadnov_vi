@@ -31,7 +31,6 @@ public class ActiveMqConfig {
     /***
      * точка входа для работы с JMS
      * ConnectionFactory->Connection->Session->MessageProducer->send
-     * @return
      */
     @Bean(CONNECTION_FACTORY)
     public ConnectionFactory connectionFactory() {
@@ -55,8 +54,6 @@ public class ActiveMqConfig {
      *  По умолчанию значение этого свойства установлено в false, что указывает на использование домена
      *  "точка-точка", Queues.
      *  setReceiveTimeout значение времени ожидания для синхронных вызовов
-     * @param connectionFactory
-     * @return
      */
     @Bean(JMS_TEMPLATE_TOPIC)
     public JmsTemplate jmsTemplateTopic(@Qualifier(CONNECTION_FACTORY) ConnectionFactory connectionFactory) {
